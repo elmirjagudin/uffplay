@@ -25,6 +25,11 @@ public class VideoFrame : MonoBehaviour
     {
         if (ctr > 128)
         {
+            if (video != null)
+            {
+                video.Close();
+                video = null;
+            }
             return;
         }
 

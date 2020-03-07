@@ -13,6 +13,9 @@ public class Video
     [DllImport("video")]
     static unsafe extern int video_decode_frame(IntPtr decoder, void *pixels);
 
+    [DllImport("video")]
+    static extern void video_close(IntPtr decoder);
+
     IntPtr decoder;
 
     public Video(string filename)
@@ -35,5 +38,10 @@ public class Video
                 throw new Exception("video_decode_frame() error " + ret);
             }
         }
+    }
+
+    public void Close()
+    {
+        video_close(decoder);
     }
 }
