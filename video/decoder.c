@@ -42,6 +42,14 @@ video_close(Video *video)
     free(video);
 }
 
+void
+video_stream_info(Video *video, int *width, int *height, int64_t *num_frames)
+{
+    *width = video->dec_ctx->width;
+    *height = video->dec_ctx->height;
+    *num_frames = video->st->nb_frames;
+}
+
 int
 video_decode_frame(Video *video, uint8_t **pixels)
 {
@@ -198,6 +206,16 @@ rgb24_save(char *fname, uint8_t *pixels, int len)
     fclose(f);
 }
 
+static void
+dump_info(char *filename, Video *vid)
+{
+    int w, h;
+    int64_t num_frames;
+
+    video_stream_info(vid, &w, &h, &num_frames);
+    printf("%s %d %d pixels, %ld frames\n", filename, w, h, num_frames);
+}
+
 int
 main(int argc, char **argv)
 {
@@ -205,12 +223,13 @@ main(int argc, char **argv)
     int r;
 
     r = video_open(&v, MOV_FILE);
-    printf("r %d v %p\n", r, v);
     if (r != 0)
     {
         fprintf(stderr, "error opening video\n");
         return 1;
     }
+
+    dump_info(MOV_FILE, v);
 
     uint8_t *pixels[1];
     pixels[0] = malloc(v->dec_ctx->width * v->dec_ctx->height * 3);

@@ -14,9 +14,20 @@ public class Video
     static unsafe extern int video_decode_frame(IntPtr decoder, void *pixels);
 
     [DllImport("video")]
+    static extern void video_stream_info(IntPtr decoder, out int width, out int height, out long num_frames);
+
+    [DllImport("video")]
     static extern void video_close(IntPtr decoder);
 
+    public int Width { get { return _Width; }}
+    public int Height { get { return _Height; }}
+    public long NumFrames { get { return _NumFrames; }}
+
     IntPtr decoder;
+
+    int _Width;
+    int _Height;
+    long _NumFrames;
 
     public Video(string filename)
     {
@@ -25,6 +36,8 @@ public class Video
         {
             throw new Exception("video_open() error " + ret);
         }
+
+        video_stream_info(decoder, out _Width, out _Height, out _NumFrames);
     }
 
     public void GetFrame(NativeArray<byte> pixels)

@@ -10,33 +10,39 @@ public class VideoFrame : MonoBehaviour
     Texture2D tex;
     Video video;
 
-    int ctr = 0;
+    long CurrFrame = 0;
 
     void Awake()
     {
-        tex = new Texture2D(WIDTH, HEIGHT, TextureFormat.RGB24, false);
+        //video = new Video("/home/boris/area51/uffplay/video/foo.mov");
+        video = new Video("/home/boris/area51/uffplay/video/DJI_0001.MOV");
+
+        tex = new Texture2D(video.Width, video.Height, TextureFormat.RGB24, false);
         image = gameObject.GetComponent<RawImage>();
         image.texture = tex;
-
-        video = new Video("/home/boris/area51/uffplay/video/DJI_0001.MOV");
     }
 
     void Update()
     {
-        if (ctr > 128)
+        if (video == null)
         {
-            if (video != null)
-            {
-                video.Close();
-                video = null;
-            }
+            /* playback finished */
             return;
         }
 
-        ctr += 1;
+        if (CurrFrame >= video.NumFrames)
+        {
+            Log.Msg("end of video");
+            video.Close();
+            video = null;
+
+            return;
+        }
 
         var data = tex.GetRawTextureData<byte>();
         video.GetFrame(data);
         tex.Apply();
+
+        CurrFrame += 1;
     }
 }
