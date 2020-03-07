@@ -1,7 +1,7 @@
 CFLAGS := $(shell PKG_CONFIG_PATH=$(FFMPEG_INST_DIR)/lib/pkgconfig pkg-config --cflags libavcodec)
 LDFLAGS := $(shell PKG_CONFIG_PATH=$(FFMPEG_INST_DIR)/lib/pkgconfig pkg-config --libs libavcodec libavformat libavdevice libswresample libswscale)
 
-libvideo.so: recorder.c
+libvideo.so: recorder.c decoder.c
 	gcc -shared -fPIC $(CFLAGS) recorder.c decoder.c -Wl,-Bsymbolic $(LDFLAGS) -o libvideo.so
 
 recorder: recorder.c

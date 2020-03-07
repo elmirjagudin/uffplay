@@ -1,4 +1,3 @@
-using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,6 +8,9 @@ public class VideoFrame : MonoBehaviour
 
     RawImage image;
     Texture2D tex;
+    Video video;
+
+    int ctr = 0;
 
     void Awake()
     {
@@ -16,7 +18,20 @@ public class VideoFrame : MonoBehaviour
         image = gameObject.GetComponent<RawImage>();
         image.texture = tex;
 
-        tex.LoadRawTextureData(File.ReadAllBytes("/home/elmjag/area51/uffplay/video/foo"));
+        video = new Video("/home/boris/area51/uffplay/video/DJI_0001.MOV");
+    }
+
+    void Update()
+    {
+        if (ctr > 128)
+        {
+            return;
+        }
+
+        ctr += 1;
+
+        var data = tex.GetRawTextureData<byte>();
+        video.GetFrame(data);
         tex.Apply();
     }
 }

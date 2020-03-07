@@ -87,26 +87,24 @@ video_decode_frame(Video *video, uint8_t **pixels)
 
         av_packet_unref(&pkt);
     }
-
 }
 
 int
-video_open(char *filename,
-           Video **video)
+video_open(Video **video, char *filename)
 {
     Video* vid = *video = calloc(1, sizeof(*vid));
 
     int ret;
 
-    ret = avformat_open_input(&(vid->fmt_ctx), MOV_FILE, NULL, NULL);
+    ret = avformat_open_input(&(vid->fmt_ctx), filename, NULL, NULL);
     if (ret < 0)
     {
-        fprintf(stderr, "cannot open %s\n", MOV_FILE);
+        fprintf(stderr, "cannot open %s\n", filename);
         goto err_out;
     }
 
     /* retrieve stream information */
-    if (avformat_find_stream_info(vid->fmt_ctx, NULL) < 0) 
+    if (avformat_find_stream_info(vid->fmt_ctx, NULL) < 0)
     {
         fprintf(stderr, "Could not find stream information\n");
         goto err_out;
@@ -350,7 +348,7 @@ main(int argc, char **argv)
     Video *v;
     int r;
 
-    r = video_open(MOV_FILE, &v);
+    r = video_open(&v, MOV_FILE);
     printf("r %d v %p\n", r, v);
     if (r != 0)
     {
@@ -370,7 +368,7 @@ main(int argc, char **argv)
         video_decode_frame(v, pixels);
         rgb24_save(fname, pixels[0], v->dec_ctx->width * v->dec_ctx->height * 3);
     }
- 
+
     video_close(v);
     printf("closed\n");
 }
