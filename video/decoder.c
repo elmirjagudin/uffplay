@@ -6,6 +6,7 @@
 #define TEXTURE_PIX_FMT AV_PIX_FMT_RGB24
 
 #define MOV_FILE "foo.mov"
+//#define MOV_FILE "DJI_0001.MOV"
 
 typedef struct Video
 {
@@ -42,16 +43,42 @@ video_close(Video *video)
     free(video);
 }
 
+/**
+ * fetch stream meta data
+ *
+ * width      - frame's width in pixels
+ * height     - frame's height in pixels
+ * start_time - video stream's start time, in stream's time base units
+ * duration   - video stream's duration, in stream's time base units
+ */
 void
-video_stream_info(Video *video, int *width, int *height, int64_t *num_frames)
+video_stream_info(Video *video, int *width, int *height,
+                  int64_t *start_time, int64_t *duration)
 {
     *width = video->dec_ctx->width;
     *height = video->dec_ctx->height;
-    *num_frames = video->st->nb_frames;
+    *start_time = video->st->start_time;
+    *duration = video->st->duration;
 }
 
 int
-video_decode_frame(Video *video, uint8_t **pixels)
+video_seek_frame(Video *video, int64_t frame_pts)
+{
+    int res;
+
+    res = av_seek_frame(video->fmt_ctx, video->stream_index, frame_pts, AVSEEK_FLAG_ANY);
+    if (res < 0)
+    {
+        fprintf(stderr, "Error in seeking\n");
+        return res;
+    };
+    avcodec_flush_buffers(video->dec_ctx);
+
+    return 0;
+}
+
+int
+video_decode_frame(Video *video, uint8_t **pixels, int64_t *pts)
 {
     while (true)
     {
@@ -61,7 +88,7 @@ video_decode_frame(Video *video, uint8_t **pixels)
         printf("ret %d stream_index %d\n", ret, pkt.stream_index);
         if (pkt.stream_index != video->stream_index)
         {
-            printf("not a video pkt, skipping");
+            printf("not a video pkt, skipping\n");
             av_packet_unref(&pkt);
             continue;
         }
@@ -76,7 +103,10 @@ video_decode_frame(Video *video, uint8_t **pixels)
         ret = avcodec_receive_frame(video->dec_ctx, video->frame);
         if (ret == 0)
         {
-            printf("got frame\n");
+            *pts = video->frame->pts;
+
+            char *keyframe = video->frame->key_frame ? "yes" : "no";
+            printf("frame pts %ld keyframe %s\n", video->frame->pts, keyframe);
 
             sws_scale(video->sws_ctx,
                       (const uint8_t *const*)video->frame->data,
@@ -206,16 +236,6 @@ rgb24_save(char *fname, uint8_t *pixels, int len)
     fclose(f);
 }
 
-static void
-dump_info(char *filename, Video *vid)
-{
-    int w, h;
-    int64_t num_frames;
-
-    video_stream_info(vid, &w, &h, &num_frames);
-    printf("%s %d %d pixels, %ld frames\n", filename, w, h, num_frames);
-}
-
 int
 main(int argc, char **argv)
 {
@@ -229,19 +249,29 @@ main(int argc, char **argv)
         return 1;
     }
 
-    dump_info(MOV_FILE, v);
+    int w, h;
+    int64_t start_time, duration;
+
+    video_stream_info(v, &w, &h, &start_time, &duration);
+    printf("%s %d %d pixels\n", MOV_FILE, w, h);
+    printf("start: %ld duration: %ld\n", start_time, duration);
 
     uint8_t *pixels[1];
     pixels[0] = malloc(v->dec_ctx->width * v->dec_ctx->height * 3);
 
     char fname[64];
-    for (int i = 0; i < 64; i += 1)
+
+    for (int i = 0;
+         true; //i < num_frames;
+         i += 1)
     {
         snprintf(fname, 64, "frame-%d", i);
         printf("fname '%s'\n", fname);
 
-        video_decode_frame(v, pixels);
-        rgb24_save(fname, pixels[0], v->dec_ctx->width * v->dec_ctx->height * 3);
+        int64_t pts;
+        video_decode_frame(v, pixels, &pts);
+
+        //rgb24_save(fname, pixels[0], v->dec_ctx->width * v->dec_ctx->height * 3);
     }
 
     video_close(v);

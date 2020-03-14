@@ -385,6 +385,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1792127753 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3995227316346049270, guid: 2721e13ccc97e83309edd1881ca34e63,
+    type: 3}
+  m_PrefabInstance: {fileID: 1863606759}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -113659843, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1863606759
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -512,6 +524,26 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3995227315914946683, guid: 2721e13ccc97e83309edd1881ca34e63,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3995227316346049225, guid: 2721e13ccc97e83309edd1881ca34e63,
+        type: 3}
+      propertyPath: Slider
+      value: 
+      objectReference: {fileID: 1792127753}
+    - target: {fileID: 3995227316346049225, guid: 2721e13ccc97e83309edd1881ca34e63,
+        type: 3}
+      propertyPath: Frames
+      value: 
+      objectReference: {fileID: 483303340}
+    - target: {fileID: 3995227316346049225, guid: 2721e13ccc97e83309edd1881ca34e63,
+        type: 3}
+      propertyPath: Video
+      value: 
+      objectReference: {fileID: 483303340}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2721e13ccc97e83309edd1881ca34e63, type: 3}
 --- !u!1 &2070985574

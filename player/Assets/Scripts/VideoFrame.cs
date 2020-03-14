@@ -3,14 +3,18 @@ using UnityEngine.UI;
 
 public class VideoFrame : MonoBehaviour
 {
+    public delegate void VideoLoaded(uint FirstFrame, uint LastFrame);
+    public static event VideoLoaded VideoLoadedEvent;
+
+    public delegate void FrameChanged(uint FrameNumer);
+    public static event FrameChanged FrameChangedEvent;
+
     const int WIDTH = 3840;
     const int HEIGHT = 2160;
 
     RawImage image;
     Texture2D tex;
     Video video;
-
-    long CurrFrame = 0;
 
     void Awake()
     {
@@ -22,6 +26,18 @@ public class VideoFrame : MonoBehaviour
         image.texture = tex;
     }
 
+    void Start()
+    {
+        Log.Msg("start {0} duration {1}", video.StartTime, video.Duration);
+        VideoLoadedEvent?.Invoke((uint)video.StartTime,
+                                 (uint)video.StartTime + (uint)video.Duration);
+    }
+
+    public void SeekFrame(long FramePTS)
+    {
+        video.Seek(FramePTS);
+    }
+
     void Update()
     {
         if (video == null)
@@ -30,19 +46,22 @@ public class VideoFrame : MonoBehaviour
             return;
         }
 
-        if (CurrFrame >= video.NumFrames)
-        {
-            Log.Msg("end of video");
-            video.Close();
-            video = null;
+        // if (CurrFrame >= video.NumFrames)
+        // {
+        //     Log.Msg("end of video");
+        //     video.Close();
+        //     video = null;
 
-            return;
-        }
+        //     return;
+        // }
+
+        long frame_pts;
 
         var data = tex.GetRawTextureData<byte>();
-        video.GetFrame(data);
+        video.GetFrame(data, out frame_pts);
         tex.Apply();
+        FrameChangedEvent?.Invoke((uint)frame_pts);
 
-        CurrFrame += 1;
+        Log.Msg("showing frame with pts {0}", frame_pts);
     }
 }

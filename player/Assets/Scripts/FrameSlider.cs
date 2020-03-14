@@ -5,21 +5,26 @@ using UnityEngine.UI;
 public class FrameSlider : MonoBehaviour
 {
     public Slider Slider;
-//    public Frames Frames;
+    public VideoFrame Video;
 
     /*
      * wraps UnityEngine.UI.Slider.value property so that we
      * can store current frame as uint (rather then float)
      */
-    uint _CurrentFrame;
-    public uint CurrentFrame
+    uint _CurrentFramePTS;
+    public uint CurrentFramePTS
     {
-        get { return _CurrentFrame; }
+        get { return _CurrentFramePTS; }
         set
         {
-            _CurrentFrame = value;
+            _CurrentFramePTS = value;
             Slider.value = value;
         }
+    }
+
+    void Awake()
+    {
+        VideoFrame.VideoLoadedEvent += Init;
     }
 
     public void Init(uint FirstFrame, uint LastFrame)
@@ -27,23 +32,24 @@ public class FrameSlider : MonoBehaviour
         Slider.minValue = FirstFrame;
         Slider.maxValue = LastFrame;
 
-//        Frames.FrameChangedEvent += HandleFrameChanged;
+        VideoFrame.FrameChangedEvent += HandleFrameChanged;
     }
 
     public void ValueChanged()
     {
-        var FrameNumber = (uint)Slider.value;
-        if (FrameNumber != CurrentFrame)
+        var FramePTS = (uint)Slider.value;
+        if (FramePTS != CurrentFramePTS)
         {
-//            Frames.GotoFrame((uint)Slider.value);
+            /* seek frames only of slider changed by the user */
+            Video.SeekFrame(FramePTS);
         }
     }
 
     void HandleFrameChanged(uint FrameNumber)
     {
-        if (FrameNumber != CurrentFrame)
+        if (FrameNumber != CurrentFramePTS)
         {
-            CurrentFrame = FrameNumber;
+            CurrentFramePTS = FrameNumber;
         }
     }
 }
