@@ -80,24 +80,40 @@ video_seek_frame(Video *video, int64_t frame_pts)
 int
 video_decode_frame(Video *video, uint8_t **pixels, int64_t *pts)
 {
+    int ret;
     while (true)
     {
         AVPacket pkt = { 0 };
 
-        int ret = av_read_frame(video->fmt_ctx, &pkt);
-        printf("ret %d stream_index %d\n", ret, pkt.stream_index);
-        if (pkt.stream_index != video->stream_index)
+        ret = av_read_frame(video->fmt_ctx, &pkt);
+        if (ret == AVERROR_EOF)
         {
-            printf("not a video pkt, skipping\n");
-            av_packet_unref(&pkt);
-            continue;
+            /* end of the file, send EOF(?) packet to decoder */
+            avcodec_send_packet(video->dec_ctx, NULL);
         }
-
-        ret = avcodec_send_packet(video->dec_ctx, &pkt);
-        if (ret != 0)
+        else if (ret != 0)
         {
-            printf("error send packt");
+            printf("av_read_frame error: %d %s\n", ret, av_err2str(ret));
             return 1;
+        }
+        else
+        {
+            /* got a new package */
+
+            if (pkt.stream_index != video->stream_index)
+            {
+                /* skip non-video stream packets */
+                printf("not a video pkt, skipping\n");
+                av_packet_unref(&pkt);
+                continue;
+            }
+
+            ret = avcodec_send_packet(video->dec_ctx, &pkt);
+            if (ret != 0)
+            {
+                printf("error send packt\n");
+                return 1;
+            }
         }
 
         ret = avcodec_receive_frame(video->dec_ctx, video->frame);
@@ -121,6 +137,11 @@ video_decode_frame(Video *video, uint8_t **pixels, int64_t *pts)
         else if (ret == AVERROR(EAGAIN))
         {
             printf("NEED more packets\n");
+        }
+        else if (ret == AVERROR_EOF)
+        {
+            printf("END OF THE MOVIE?\n");
+            return -1;
         }
 
         av_packet_unref(&pkt);
@@ -261,15 +282,14 @@ main(int argc, char **argv)
 
     char fname[64];
 
-    for (int i = 0;
-         true; //i < num_frames;
-         i += 1)
+    r = 0;
+    for (int i = 0; r == 0; i += 1)
     {
         snprintf(fname, 64, "frame-%d", i);
         printf("fname '%s'\n", fname);
 
         int64_t pts;
-        video_decode_frame(v, pixels, &pts);
+        r = video_decode_frame(v, pixels, &pts);
 
         //rgb24_save(fname, pixels[0], v->dec_ctx->width * v->dec_ctx->height * 3);
     }

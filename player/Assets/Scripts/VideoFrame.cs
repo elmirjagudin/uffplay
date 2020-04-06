@@ -46,22 +46,19 @@ public class VideoFrame : MonoBehaviour
             return;
         }
 
-        // if (CurrFrame >= video.NumFrames)
-        // {
-        //     Log.Msg("end of video");
-        //     video.Close();
-        //     video = null;
-
-        //     return;
-        // }
-
-        long frame_pts;
-
-        var data = tex.GetRawTextureData<byte>();
-        video.GetFrame(data, out frame_pts);
-        tex.Apply();
-        FrameChangedEvent?.Invoke((uint)frame_pts);
-
-        Log.Msg("showing frame with pts {0}", frame_pts);
+        try
+        {
+            long frame_pts;
+            var data = tex.GetRawTextureData<byte>();
+            video.GetFrame(data, out frame_pts);
+            tex.Apply();
+            FrameChangedEvent?.Invoke((uint)frame_pts);
+            Log.Msg("showing frame with pts {0}", frame_pts);
+        }
+        catch (EndOfVideo)
+        {
+            video = null;
+            Log.Msg("End of Video");
+        }
     }
 }

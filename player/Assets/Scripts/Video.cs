@@ -5,6 +5,8 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 
 
+public class EndOfVideo : Exception {}
+
 public class Video
 {
     [DllImport("video")]
@@ -64,6 +66,11 @@ public class Video
         {
             void *ptr = NativeArrayUnsafeUtility.GetUnsafePtr(pixels);
             var ret = video_decode_frame(decoder, &ptr, out pts);
+            if (ret == -1)
+            {
+                throw new EndOfVideo();
+            }
+
             if (ret != 0)
             {
                 throw new Exception("video_decode_frame() error " + ret);
