@@ -1,26 +1,9 @@
 #!/bin/sh
 
 
-STREAMING_ASSETS_DIR="$(pwd)/unity/Assets/StreamingAssets"
-PLUGINS_DIR="$(pwd)/panopt/Assets/Plugins"
-PROJ_SRC_DIR="$(pwd)/proj.4"
-
+PLUGINS_DIR="$(pwd)/player/Assets/Plugins"
 BUILD_DIR="$(pwd)/build"
-PROJ_BUILD_DIR="$BUILD_DIR/proj"
 FFMPEG_INST_DIR="$BUILD_DIR/ffmpeg"
-
-#echo "$FFMPEG_INST_DIR"
-#exit
-
-## build proj.4
-#mkdir -p "$PROJ_BUILD_DIR"
-#cd "$PROJ_BUILD_DIR"
-#cmake -DBUILD_LIBPROJ_SHARED=ON -DCMAKE_BUILD_TYPE=Debug "$PROJ_SRC_DIR"
-#make
-#mkdir -p "$PLUGINS_DIR"
-#cp "$PROJ_BUILD_DIR/lib/libproj.so" "$PLUGINS_DIR"
-#cp "$PROJ_BUILD_DIR/data/proj.db" "$STREAMING_ASSETS_DIR"
-#cd -
 
 # build ffmpeg
 mkdir -p "$FFMPEG_INST_DIR"
