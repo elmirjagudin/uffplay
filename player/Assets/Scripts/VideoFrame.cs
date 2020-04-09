@@ -14,12 +14,12 @@ public class VideoFrame : MonoBehaviour
 
     RawImage image;
     Texture2D tex;
-    Video video;
+    VideoDecoder video;
 
     void Awake()
     {
         //video = new Video("/home/boris/area51/uffplay/video/foo.mov");
-        video = new Video("/home/boris/area51/uffplay/video/DJI_0001.MOV");
+        video = new VideoDecoder("/home/boris/area51/old_uffplay/video/DJI_0001.MOV");
 
         tex = new Texture2D(video.Width, video.Height, TextureFormat.RGB24, false);
         image = gameObject.GetComponent<RawImage>();

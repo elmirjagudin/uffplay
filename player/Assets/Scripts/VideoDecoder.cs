@@ -7,7 +7,7 @@ using Unity.Collections.LowLevel.Unsafe;
 
 public class EndOfVideo : Exception {}
 
-public class Video
+public class VideoDecoder
 {
     [DllImport("video")]
     static extern int video_open(ref IntPtr decoder, string filename);
@@ -38,7 +38,7 @@ public class Video
     long _StartTime;
     long _Duration;
 
-    public Video(string filename)
+    public VideoDecoder(string filename)
     {
         var ret = video_open(ref decoder, filename);
         if (ret != 0)
