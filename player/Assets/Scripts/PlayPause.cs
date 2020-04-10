@@ -3,13 +3,14 @@ using UnityEngine.UI;
 
 public class PlayPause : MonoBehaviour
 {
-//    public Frames Frames;
+    public Video Video;
     public Sprite Play;
     public Sprite Pause;
 
     void Awake()
     {
-//        Frames.PlaybackModeChangedEvent += HandlePlaybackModeChange;
+        Video.VideoPlayingEvent += HadleVideoPlaying;
+        Video.VideoPausedEvent += HadleVideoPaused;
     }
 
     Image CurrentImage()
@@ -26,11 +27,11 @@ public class PlayPause : MonoBehaviour
     {
         if (IsPaused())
         {
-//            Frames.Play();
+            Video.Play();
         }
         else
         {
-//            Frames.Pause();
+            Video.Pause();
         }
     }
 
@@ -39,17 +40,13 @@ public class PlayPause : MonoBehaviour
         CurrentImage().sprite = sprite;
     }
 
-    // void HandlePlaybackModeChange(Frames.PlaybackMode mode)
-    // {
-    //     switch (mode)
-    //     {
-    //         case Frames.PlaybackMode.Play:
-    //             SetSprite(Pause);
-    //             break;
-    //         case Frames.PlaybackMode.Step:
-    //             SetSprite(Play);
-    //             break;
-    //         // TODO: disable on other modes?
-    //     }
-    // }
+    void HadleVideoPlaying()
+    {
+        SetSprite(Pause);
+    }
+
+    void HadleVideoPaused()
+    {
+        SetSprite(Play);
+    }
 }

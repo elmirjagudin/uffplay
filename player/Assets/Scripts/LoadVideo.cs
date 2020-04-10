@@ -7,6 +7,7 @@ public class LoadVideo : MonoBehaviour
 {
     public InputField FileName;
     public Button LoadButton;
+    public Video Video;
 
     void Start()
     {
@@ -21,7 +22,9 @@ public class LoadVideo : MonoBehaviour
     public void Load()
     {
         gameObject.SetActive(false);
-        Persisted.LastVideoFile = FileName.text;
-        Log.Msg("Load '{0}'", FileName.text);
+
+        var file = FileName.text;
+        Persisted.LastVideoFile = file;
+        Video.Open(file);
     }
 }
