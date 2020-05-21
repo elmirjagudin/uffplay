@@ -696,7 +696,7 @@ PrefabInstance:
         type: 3}
       propertyPath: Pause
       value: 
-      objectReference: {fileID: 21300000, guid: 667d70c7905e6b3c7a480034cc61dcf7,
+      objectReference: {fileID: 21300000, guid: 654915598919ca06dbffd739184f17ac,
         type: 3}
     - target: {fileID: 3995227317558629507, guid: 2721e13ccc97e83309edd1881ca34e63,
         type: 3}
