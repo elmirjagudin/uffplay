@@ -703,7 +703,8 @@ PrefabInstance:
       propertyPath: Video
       value: 
       objectReference: {fileID: 483303340}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3995227316778383979, guid: 2721e13ccc97e83309edd1881ca34e63, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 2721e13ccc97e83309edd1881ca34e63, type: 3}
 --- !u!1 &2070985574
 GameObject:
